@@ -24,12 +24,18 @@ const (
 // AppleAuth is the contract for communication and validation of
 // Apple user tokens.
 type AppleAuth interface {
-	// ValidateCode validates an authorization code returning the associated
-	// Apple user and the generated tokens(access and refresh).
+	// ValidateCode validates an authorization code returning refresh token,
+	// access token and token id.
 	ValidateCode(code string) (*TokenResponse, error)
-}
 
-type AppleUser struct{}
+	// ValidateCode validates an authorization code with a redirect uri returning
+	// refresh token, access token and token id.
+	ValidateCodeWithRedirectURI(code, redirectURI string) (*TokenResponse, error)
+
+	// ValidateRefreshToken validates a refresh token returning refresh token, access
+	// token and token id.
+	ValidateRefreshToken(refreshToken string) (*TokenResponse, error)
+}
 
 // TokenResponse response when validation was successfull.
 type TokenResponse struct {
@@ -107,6 +113,37 @@ func (a *appleAuth) ValidateCode(code string) (*TokenResponse, error) {
 	formQuery.Add("client_secret", clientSecret)
 	formQuery.Add("code", code)
 	formQuery.Add("grant_type", "authorization_code")
+	return a.validateRequest(formQuery)
+}
+
+func (a *appleAuth) ValidateCodeWithRedirectURI(code, redirectURI string) (*TokenResponse, error) {
+	clientSecret, err := a.clientSecret()
+	if err != nil {
+		return nil, err
+	}
+	var formQuery url.Values
+	formQuery.Add("client_id", a.AppID)
+	formQuery.Add("client_secret", clientSecret)
+	formQuery.Add("code", code)
+	formQuery.Add("grant_type", "authorization_code")
+	formQuery.Add("redirect_uri", redirectURI)
+	return a.validateRequest(formQuery)
+}
+
+func (a *appleAuth) ValidateRefreshToken(refreshToken string) (*TokenResponse, error) {
+	clientSecret, err := a.clientSecret()
+	if err != nil {
+		return nil, err
+	}
+	var formQuery url.Values
+	formQuery.Add("client_id", a.AppID)
+	formQuery.Add("client_secret", clientSecret)
+	formQuery.Add("refresh_token", refreshToken)
+	formQuery.Add("grant_type", "refresh_token")
+	return a.validateRequest(formQuery)
+}
+
+func (a *appleAuth) validateRequest(formQuery url.Values) (*TokenResponse, error) {
 	res, err := http.PostForm(validationEndpoint, formQuery)
 	if err != nil {
 		return nil, err
