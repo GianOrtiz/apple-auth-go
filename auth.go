@@ -41,16 +41,16 @@ type AppleAuth interface {
 type TokenResponse struct {
 	// AccessToken (Reserved for future use) A token used to access allowed data.
 	// Currently, no data set has been defined for access.
-	AccessToken string
+	AccessToken string `json:"access_token"`
 	// ExpiresIn the amount of time, in seconds, before the access token expires.
-	ExpiresIn int
+	ExpiresIn int `json:"expires_in"`
 	// IDToken a JSON Web Token that contains the user’s identity information.
-	IDToken string
+	IDToken string `json:"id_token"`
 	// RefreshToken The refresh token used to regenerate new access tokens.
 	// Store this token securely on your server.
-	RefreshToken string
+	RefreshToken string `json:"refresh_token"`
 	// TokenType the type of access token.
-	TokenType string
+	TokenType string `json:"token_type"`
 }
 
 type appleAuth struct {
