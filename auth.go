@@ -53,11 +53,16 @@ type TokenResponse struct {
 	TokenType string `json:"token_type"`
 }
 
+type httpClient interface {
+	PostForm(url string, data url.Values) (resp *http.Response, err error)
+}
+
 type appleAuth struct {
 	AppID      string
 	TeamID     string
 	KeyID      string
 	KeyContent []byte
+	httpClient httpClient
 }
 
 // Setup and return a new AppleAuth for validation of tokens.
@@ -71,6 +76,9 @@ func New(appID, teamID, keyID, keyPath string) (*appleAuth, error) {
 		TeamID:     teamID,
 		AppID:      appID,
 		KeyContent: keyContent,
+		httpClient: &http.Client{
+			Timeout: http.DefaultClient.Timeout,
+		},
 	}, nil
 }
 
@@ -144,7 +152,7 @@ func (a *appleAuth) ValidateRefreshToken(refreshToken string) (*TokenResponse, e
 }
 
 func (a *appleAuth) validateRequest(formQuery url.Values) (*TokenResponse, error) {
-	res, err := http.PostForm(validationEndpoint, formQuery)
+	res, err := a.httpClient.PostForm(validationEndpoint, formQuery)
 	if err != nil {
 		return nil, err
 	}
