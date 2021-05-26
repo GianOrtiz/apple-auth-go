@@ -61,7 +61,20 @@ func GetUserInfoFromIDToken(idToken string) (*AppleUser, error) {
 		u.IsPrivateEmail = isPrivateEmail
 	}
 
-	if realUserStatus, ok := claims["real_user_status"].(int); ok {
+	// As in JSON ints and floats are the same type, the number type, we must check if the number is
+	// either an int or a float, and convert it to the first if the later.
+	var (
+		realUserStatus int
+		ok             bool
+	)
+	if realUserStatus, ok = claims["real_user_status"].(int); !ok {
+		var realUserStatusFloat float64
+		if realUserStatusFloat, ok = claims["real_user_status"].(float64); ok {
+			realUserStatus = int(realUserStatusFloat)
+		}
+	}
+
+	if ok {
 		switch realUserStatus {
 		case int(RealUserStatusLikelyReal):
 			u.RealUserStatus = RealUserStatusLikelyReal

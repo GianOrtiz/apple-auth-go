@@ -37,6 +37,10 @@ type AppleAuth interface {
 	ValidateRefreshToken(refreshToken string) (*TokenResponse, error)
 }
 
+type appleErrorResponseBody struct {
+	Error string `json:"error"`
+}
+
 // TokenResponse response when validation was successfull.
 type TokenResponse struct {
 	// AccessToken (Reserved for future use) A token used to access allowed data.
@@ -116,7 +120,11 @@ func (a *appleAuth) ValidateCode(code string) (*TokenResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	var formQuery url.Values
+	return a.validateCode(clientSecret, code)
+}
+
+func (a *appleAuth) validateCode(clientSecret, code string) (*TokenResponse, error) {
+	formQuery := make(url.Values)
 	formQuery.Add("client_id", a.AppID)
 	formQuery.Add("client_secret", clientSecret)
 	formQuery.Add("code", code)
@@ -129,7 +137,11 @@ func (a *appleAuth) ValidateCodeWithRedirectURI(code, redirectURI string) (*Toke
 	if err != nil {
 		return nil, err
 	}
-	var formQuery url.Values
+	return a.validateCodeWithRedirectURI(clientSecret, code, redirectURI)
+}
+
+func (a *appleAuth) validateCodeWithRedirectURI(clientSecret, code, redirectURI string) (*TokenResponse, error) {
+	formQuery := make(url.Values)
 	formQuery.Add("client_id", a.AppID)
 	formQuery.Add("client_secret", clientSecret)
 	formQuery.Add("code", code)
@@ -143,7 +155,11 @@ func (a *appleAuth) ValidateRefreshToken(refreshToken string) (*TokenResponse, e
 	if err != nil {
 		return nil, err
 	}
-	var formQuery url.Values
+	return a.validateRefreshToken(clientSecret, refreshToken)
+}
+
+func (a *appleAuth) validateRefreshToken(clientSecret, refreshToken string) (*TokenResponse, error) {
+	formQuery := make(url.Values)
 	formQuery.Add("client_id", a.AppID)
 	formQuery.Add("client_secret", clientSecret)
 	formQuery.Add("refresh_token", refreshToken)
@@ -161,9 +177,7 @@ func (a *appleAuth) validateRequest(formQuery url.Values) (*TokenResponse, error
 	}()
 
 	if res.StatusCode != http.StatusOK {
-		var errorResponseBody struct {
-			Error string `json:"error"`
-		}
+		var errorResponseBody appleErrorResponseBody
 		if err := json.NewDecoder(res.Body).Decode(&errorResponseBody); err != nil {
 			return nil, err
 		}
