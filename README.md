@@ -1,5 +1,9 @@
 # apple-auth-go
 
+[![GoDoc](https://godoc.org/github.com/GianOrtiz/apple-auth-go?status.svg)](https://pkg.go.dev/github.com/GianOrtiz/apple-auth-go)
+[![codecov](https://codecov.io/gh/GianOrtiz/apple-auth-go/branch/master/graph/badge.svg)](https://codecov.io/gh/GianOrtiz/apple-auth-go)
+[![Build Status](https://travis-ci.com/GianOrtiz/apple-auth-go.svg?branch=master)](https://travis-ci.com/GianOrtiz/apple-auth-go)
+
 `apple-auth-go` is a unofficial Golang package to validate authorization tokens and manage the authorization of Apple Sign In server side. It provides utility functions and models to retrieve user information and validate authorization codes.
 
 ## Installation

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
@@ -43,7 +43,7 @@ func TestValidateRequest(t *testing.T) {
 	mockedHTTPClient.On("PostForm", validationEndpoint, form).Return(
 		&http.Response{
 			StatusCode: 200,
-			Body:       io.NopCloser(bytes.NewReader(tokenResponseBody)),
+			Body:       ioutil.NopCloser(bytes.NewReader(tokenResponseBody)),
 		},
 		nil,
 	)
@@ -82,7 +82,7 @@ func TestValidateCode(t *testing.T) {
 	mockedHTTPClient.On("PostForm", validationEndpoint, reqForm).Return(
 		&http.Response{
 			StatusCode: 200,
-			Body:       io.NopCloser(bytes.NewReader(tokenResponseBody)),
+			Body:       ioutil.NopCloser(bytes.NewReader(tokenResponseBody)),
 		},
 		nil,
 	)
@@ -116,7 +116,7 @@ func TestValidateCodeWithRedirectURI(t *testing.T) {
 	mockedHTTPClient.On("PostForm", validationEndpoint, reqForm).Return(
 		&http.Response{
 			StatusCode: 200,
-			Body:       io.NopCloser(bytes.NewReader(tokenResponseBody)),
+			Body:       ioutil.NopCloser(bytes.NewReader(tokenResponseBody)),
 		},
 		nil,
 	)
@@ -148,7 +148,7 @@ func TestValidateRefreshToken(t *testing.T) {
 	mockedHTTPClient.On("PostForm", validationEndpoint, reqForm).Return(
 		&http.Response{
 			StatusCode: 200,
-			Body:       io.NopCloser(bytes.NewReader(tokenResponseBody)),
+			Body:       ioutil.NopCloser(bytes.NewReader(tokenResponseBody)),
 		},
 		nil,
 	)
